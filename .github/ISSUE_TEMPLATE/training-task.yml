@@ -1,0 +1,33 @@
+name: 训练任务
+description: 执行一个模拟案例并记录证据
+title: "[训练] 案例与学员"
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: "仅使用合成或已授权数据；不要在 Issue 中发布敏感信息或导师答案。"
+  - type: textarea
+    id: task
+    attributes:
+      label: 案例、岗位、负责人和目标等级
+      description: 链接案例并说明前置条件
+    validations:
+      required: true
+  - type: textarea
+    id: plan
+    attributes:
+      label: 目标理解、计划和待确认问题
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 提交物、验收条件和证据链接
+      description: 链接案例的公开验收清单及测试记录
+    validations:
+      required: true
+  - type: textarea
+    id: help
+    attributes:
+      label: AI 帮助等级、具体帮助、复盘与下一步
+      description: 记录最高 H0–H3，独立复现另记

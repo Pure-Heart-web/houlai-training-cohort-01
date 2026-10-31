@@ -1,0 +1,10 @@
+// Public format regression checks; contains no business or technical answers.
+const {test}=require('node:test');const assert=require('node:assert/strict');const S=require('../console/submission.js');
+function valid(){const d=Object.fromEntries(S.FIELDS.map(k=>[k,'模拟过程记录']));d.aiLevel='H0';return S.envelope(1,'Day 1',d);}
+test('JSON round trip and Markdown carry process',()=>{const e=valid();assert.deepEqual(S.parse(JSON.stringify(e)),e);assert.ok(S.markdown(e).includes('模拟过程记录'));});
+test('wrong types never silently become empty strings',()=>{const e=valid();e.submission.initial={text:'x'};assert.throws(()=>S.parse(JSON.stringify(e)));});
+test('reject malformed envelope, ranges and arrays',()=>{for(const bad of [null,[],{}, {...valid(),day:0},{...valid(),day:8},{...valid(),day:1.5},{...valid(),submission:[]},{...valid(),schemaVersion:'2'}])assert.throws(()=>S.parse(JSON.stringify(bad)));});
+test('reject unknown and prototype keys',()=>{const e=valid();e.submission.extra='x';assert.throws(()=>S.parse(JSON.stringify(e)));const s=JSON.stringify(valid()).replace('"submission":{','"submission":{"__proto__":{},');assert.throws(()=>S.parse(s));});
+test('limit field and payload size',()=>{const e=valid();e.submission.initial='x'.repeat(20001);assert.throws(()=>S.parse(JSON.stringify(e)));assert.throws(()=>S.parse(' '.repeat(S.LIMIT+1)));});
+test('reject invalid metadata and incomplete snapshot',()=>{for(const change of [{aiLevel:'H4'},{role:'admin'},{mode:'unknown'},{initialRecordedAt:'yesterday'},{initialRecordedAt:new Date().toISOString()}]){const e=valid();Object.assign(e.submission,change);assert.throws(()=>S.parse(JSON.stringify(e)));}});
+test('legacy v2 export can be read without fabricating snapshot',()=>{const e=valid();delete e.schemaVersion;for(const k of ['role','mode','learner','aiHelpDetails','initialRecordedAt','initialSnapshot','initialFactsSnapshot','promptMapRecordedAt','lastEdited'])delete e.submission[k];const out=S.parse(JSON.stringify(e));assert.equal(out.submission.initialRecordedAt,'');assert.equal(out.submission.role,'未选择');});

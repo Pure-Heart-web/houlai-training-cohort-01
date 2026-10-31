@@ -1,0 +1,21 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>公开资料查看器</title><style>body{max-width:960px;margin:30px auto;padding:0 20px;font:16px/1.7 system-ui;color:#173237}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f2f7f5;padding:20px;border-radius:12px}a{color:#087e72}</style><a href="./">返回训练台</a> · <a id="raw">打开/下载原文</a><h1 id="name">公开模拟训练资料</h1><nav id="doclinks" aria-label="本文资料链接"></nav><pre id="content">正在读取…</pre><script>
+'use strict';
+const file=new URLSearchParams(location.search).get('file')||'README.md';
+// Only serve public documents; no user HTML is executed.
+const valid=/^(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_\u3400-\u9fff与日]+\.(md|csv)$/.test(file)&&!file.includes('..');
+if(!valid){document.getElementById('content').textContent='无效资料路径';}else{
+ document.getElementById('name').textContent=file;document.getElementById('raw').href='../'+file;
+ fetch('../'+file).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.text();}).then(t=>{
+ document.getElementById('content').textContent=t;
+ const nav=document.getElementById('doclinks');
+ for(const match of t.matchAll(/\[([^\]]+)\]\(([^\s)]+)\)/g)){
+   const target=new URL(match[2],new URL('../'+file,location.href));
+   if(!['http:','https:'].includes(target.protocol))continue;
+   const a=document.createElement('a');a.textContent=match[1];a.style.marginRight='14px';
+   if(target.origin===location.origin && /\.(md|csv)$/.test(target.pathname))a.href='viewer.html?file='+encodeURIComponent(decodeURIComponent(target.pathname.slice(1)));
+   else a.href=target.href;
+   a.target='_blank';a.rel='noopener noreferrer';nav.appendChild(a);
+ }
+}).catch(e=>document.getElementById('content').textContent='无法读取：'+e.message);
+}
+</script></html>
