@@ -1,0 +1,5 @@
+Case ID: DS03
+Equipment ID: P-103
+Revision: A
+Flow: 58 m3/h
+Head per pump: 38 m
